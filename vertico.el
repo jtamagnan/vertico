@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 1.7
-;; Package-Requires: ((emacs "27.1") (compat "29.1.4.4"))
+;; Package-Requires: ((emacs "27.1") (compat "30"))
 ;; Homepage: https://github.com/minad/vertico
 ;; Keywords: convenience, files, matching, completion
 
@@ -249,11 +249,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--affixate (cands)
   "Annotate CANDS with annotation function."
-  (if-let ((aff (or (vertico--metadata-get 'affixation-function)
-                    (plist-get completion-extra-properties :affixation-function))))
+  (if-let ((aff (vertico--metadata-get 'affixation-function)))
       (funcall aff cands)
-    (if-let ((ann (or (vertico--metadata-get 'annotation-function)
-                      (plist-get completion-extra-properties :annotation-function))))
+    (if-let ((ann (vertico--metadata-get 'annotation-function)))
         (cl-loop for cand in cands collect
                  (let ((suff (or (funcall ann cand) "")))
                    ;; The default completion UI adds the `completions-annotations'
@@ -301,7 +299,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--metadata-get (prop)
   "Return PROP from completion metadata."
-  (completion-metadata-get vertico--metadata prop))
+  (compat-call completion-metadata-get vertico--metadata prop))
 
 (defun vertico--sort-function ()
   "Return the sorting function."
